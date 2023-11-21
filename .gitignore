@@ -1,0 +1,7 @@
+﻿.idea
+server/bin
+server/obj
+create-task/bin
+create-task/obj
+dashboard/bin
+dashboard/obj
