@@ -1,0 +1,29 @@
+﻿version: '3.7'
+services:
+  redis:
+    image: redis:latest
+  hangfire-server:
+    image: hangfire-server
+    build:
+      context: ./
+      dockerfile: server/Dockerfile
+    depends_on:
+      - redis
+  hangfire-client:
+    image: hangfire-client
+    build:
+      context: ./
+      dockerfile: create-task/Dockerfile
+    depends_on:
+      - hangfire-server
+      - redis
+  hangfire-dashboard:
+    image: hangfire-dashboard
+    build:
+      context: ./
+      dockerfile: dashboard/Dockerfile
+    depends_on:
+      - hangfire-server
+      - redis
+    ports:
+      - 8888:80

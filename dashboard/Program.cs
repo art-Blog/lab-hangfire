@@ -5,6 +5,8 @@ using Hangfire.Redis.StackExchange;
 var builder = WebApplication.CreateBuilder(args);
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
+Console.WriteLine("Redis ConnectionString: " + redisConnectionString);
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddHangfire(config =>
@@ -13,8 +15,8 @@ builder.Services.AddHangfire(config =>
     config.UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.ServerCount) //服务器数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.RecurringJobCount) //任务数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.RetriesCount) //重试次数
-        //.UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.EnqueuedCountOrNull)//队列数量
-        //.UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.FailedCountOrNull)//失败数量
+        .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.EnqueuedCountOrNull)//队列数量
+        .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.FailedCountOrNull)//失败数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.EnqueuedAndQueueCount) //队列数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.ScheduledCount) //计划任务数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.ProcessingCount) //执行中的任务数量
@@ -49,11 +51,15 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapRazorPages();
+    endpoints.MapHangfireDashboard();
+});
+
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/hangfire");
     return Task.CompletedTask;
 });
-app.MapRazorPages();
-
 app.Run();
