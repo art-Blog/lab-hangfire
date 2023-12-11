@@ -1,7 +1,7 @@
 ﻿using Hangfire.Annotations;
 using Hangfire.Dashboard;
 
-namespace dashboard.Model;
+namespace website.Models;
 
 public class MyAuthFilter : IDashboardAuthorizationFilter {
     public bool Authorize([NotNull] DashboardContext context) {

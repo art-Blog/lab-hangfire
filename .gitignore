@@ -5,3 +5,7 @@ create-task/bin
 create-task/obj
 dashboard/bin
 dashboard/obj
+website/bin
+website/obj
+Schedule/obj
+Schedule/bin

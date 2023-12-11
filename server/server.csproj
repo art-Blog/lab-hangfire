@@ -29,4 +29,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Schedule\Schedule.csproj" />
+    </ItemGroup>
+
 </Project>

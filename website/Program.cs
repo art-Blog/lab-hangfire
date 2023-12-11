@@ -1,22 +1,27 @@
-using dashboard.Model;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
+using Schedule;
+using website.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 
 Console.WriteLine("Redis ConnectionString: " + redisConnectionString);
-
 // Add services to the container.
-builder.Services.AddRazorPages();
+
+builder.Services.AddScoped<IMyHelloWorld, MyMyHelloWorld>();
+builder.Services.AddScoped<IMyDelayJob, MyDelayJob>();
+builder.Services.AddScoped<IMyRecurringJob, MyRecurringJob>();
+
+builder.Services.AddControllersWithViews();
 builder.Services.AddHangfire(config =>
 {
     config.UseRedisStorage(redisConnectionString);
     config.UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.ServerCount) //服务器数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.RecurringJobCount) //任务数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.RetriesCount) //重试次数
-        .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.EnqueuedCountOrNull)//队列数量
-        .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.FailedCountOrNull)//失败数量
+        .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.EnqueuedCountOrNull) //队列数量
+        .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.FailedCountOrNull) //失败数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.EnqueuedAndQueueCount) //队列数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.ScheduledCount) //计划任务数量
         .UseDashboardMetric(Hangfire.Dashboard.DashboardMetrics.ProcessingCount) //执行中的任务数量
@@ -31,7 +36,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -50,16 +55,10 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseEndpoints(endpoints => { endpoints.MapHangfireDashboard(); });
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapRazorPages();
-    endpoints.MapHangfireDashboard();
-});
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapGet("/", context =>
-{
-    context.Response.Redirect("/hangfire");
-    return Task.CompletedTask;
-});
 app.Run();

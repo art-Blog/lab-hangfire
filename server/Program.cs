@@ -1,6 +1,8 @@
 ﻿using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Schedule;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 var builder = new ConfigurationBuilder()
@@ -10,6 +12,13 @@ var builder = new ConfigurationBuilder()
 var redisConnectionString = builder.Build().GetConnectionString("Redis");
 Console.WriteLine("Redis ConnectionString: " + redisConnectionString);
 
+// Create a new service collection
+var services = new ServiceCollection();
+
+// Add your services to the collection
+services.AddScoped<IMyHelloWorld, MyMyHelloWorld>();
+services.AddScoped<IMyDelayJob, MyDelayJob>();
+services.AddScoped<IMyRecurringJob, MyRecurringJob>();
 
 GlobalConfiguration.Configuration
     .UseColouredConsoleLogProvider()
